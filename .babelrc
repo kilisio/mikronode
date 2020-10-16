@@ -1,11 +1,14 @@
 {
-	"sourceMaps": false,
-  "presets": ['es2015','stage-1']
-, "plugins": [
-      ["transform-replace-object-assign", "simple-assign"]
-    , "transform-dev-warning"
-    , "add-module-exports"
-    , "transform-decorators-legacy"
-    , "transform-private-properties"
-  ]
+    "presets": [
+        "@babel/preset-env"
+    ],
+    "plugins": [
+        "@babel/plugin-external-helpers", 
+        "@babel/plugin-transform-runtime",
+        "@babel/plugin-transform-spread",
+        "@babel/plugin-syntax-object-rest-spread",
+        "@babel/plugin-transform-async-to-generator",
+        ["@babel/plugin-proposal-decorators", { "legacy": true }],
+        ["@babel/plugin-proposal-class-properties", { "loose" : true }]
+    ]
 }

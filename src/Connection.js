@@ -1,4 +1,3 @@
-import util from 'util';
 import events from 'events';
 import {Subject, Observable} from 'rxjs';
 import {autobind} from 'core-decorators';

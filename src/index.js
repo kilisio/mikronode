@@ -1,4 +1,3 @@
-import util from 'util';
 import net from 'net';
 import TLS from 'tls';
 import Promise from 'promise';
@@ -9,7 +8,7 @@ import dns from 'dns';
 
 import {hexDump, decodePacket, encodeString, objToAPIParams, resultsToObj, getUnwrappedPromise} from './Util.js';
 import {STRING_TYPE, DEBUG, CONNECTION,CHANNEL,EVENT} from './constants.js';
-import parser from './parser.js';
+import * as parser from './parser';
 
 import Connection from './Connection';
 

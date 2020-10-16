@@ -1,6 +1,5 @@
-import util from 'util';
 import events from 'events';
-import {Observable, Subject, Scheduler} from 'rxjs';
+import {Observable, Subject} from 'rxjs';
 import {DEBUG, CONNECTION, CHANNEL, EVENT} from './constants.js';
 import {resultsToObj,getUnwrappedPromise} from './Util.js';
 // console.log2=console.log;
