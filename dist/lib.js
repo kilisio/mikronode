@@ -8,6 +8,31 @@ var crypto = _interopDefault(require('crypto'));
 var dns = _interopDefault(require('dns'));
 var events = _interopDefault(require('events'));
 
+function _applyDecoratedDescriptor(target, property, decorators, descriptor, context) {
+  var desc = {};
+  Object.keys(descriptor).forEach(function (key) {
+    desc[key] = descriptor[key];
+  });
+  desc.enumerable = !!desc.enumerable;
+  desc.configurable = !!desc.configurable;
+  if ('value' in desc || desc.initializer) {
+    desc.writable = true;
+  }
+  desc = decorators.slice().reverse().reduce(function (desc, decorator) {
+    return decorator(target, property, desc) || desc;
+  }, desc);
+  if (context && desc.initializer !== void 0) {
+    desc.value = desc.initializer ? desc.initializer.call(context) : void 0;
+    desc.initializer = undefined;
+  }
+  if (desc.initializer === void 0) {
+    Object.defineProperty(target, property, desc);
+    desc = null;
+  }
+  return desc;
+}
+var applyDecoratedDescriptor = _applyDecoratedDescriptor;
+
 function _arrayLikeToArray(arr, len) {
   if (len == null || len > arr.length) len = arr.length;
   for (var i = 0, arr2 = new Array(len); i < len; i++) {
@@ -112,17 +137,6 @@ function _typeof(obj) {
 module.exports = _typeof;
 });
 
-function _initializerDefineProperty(target, property, descriptor, context) {
-  if (!descriptor) return;
-  Object.defineProperty(target, property, {
-    enumerable: descriptor.enumerable,
-    configurable: descriptor.configurable,
-    writable: descriptor.writable,
-    value: descriptor.initializer ? descriptor.initializer.call(context) : void 0
-  });
-}
-var initializerDefineProperty = _initializerDefineProperty;
-
 function _classCallCheck(instance, Constructor) {
   if (!(instance instanceof Constructor)) {
     throw new TypeError("Cannot call a class as a function");
@@ -145,36 +159,6 @@ function _createClass(Constructor, protoProps, staticProps) {
   return Constructor;
 }
 var createClass = _createClass;
-
-function _applyDecoratedDescriptor(target, property, decorators, descriptor, context) {
-  var desc = {};
-  Object.keys(descriptor).forEach(function (key) {
-    desc[key] = descriptor[key];
-  });
-  desc.enumerable = !!desc.enumerable;
-  desc.configurable = !!desc.configurable;
-  if ('value' in desc || desc.initializer) {
-    desc.writable = true;
-  }
-  desc = decorators.slice().reverse().reduce(function (desc, decorator) {
-    return decorator(target, property, desc) || desc;
-  }, desc);
-  if (context && desc.initializer !== void 0) {
-    desc.value = desc.initializer ? desc.initializer.call(context) : void 0;
-    desc.initializer = undefined;
-  }
-  if (desc.initializer === void 0) {
-    Object.defineProperty(target, property, desc);
-    desc = null;
-  }
-  return desc;
-}
-var applyDecoratedDescriptor = _applyDecoratedDescriptor;
-
-function _initializerWarningHelper(descriptor, context) {
-  throw new Error('Decorating class property failed. Please ensure that ' + 'proposal-class-properties is enabled and runs after the decorators transform.');
-}
-var initializerWarningHelper = _initializerWarningHelper;
 
 "use strict";
 var domain;
@@ -15545,51 +15529,190 @@ function _get(target, property, receiver) {
 module.exports = _get;
 });
 
-var _class, _descriptor, _descriptor2, _descriptor3, _descriptor4, _descriptor5, _descriptor6, _descriptor7, _descriptor8, _descriptor9, _descriptor10, _descriptor11, _descriptor12, _descriptor13, _descriptor14, _descriptor15, _descriptor16, _descriptor17, _descriptor18, _temp;
 function ownKeys(object, enumerableOnly) { var keys = Object.keys(object); if (Object.getOwnPropertySymbols) { var symbols = Object.getOwnPropertySymbols(object); if (enumerableOnly) symbols = symbols.filter(function (sym) { return Object.getOwnPropertyDescriptor(object, sym).enumerable; }); keys.push.apply(keys, symbols); } return keys; }
 function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i] != null ? arguments[i] : {}; if (i % 2) { ownKeys(Object(source), true).forEach(function (key) { defineProperty(target, key, source[key]); }); } else if (Object.getOwnPropertyDescriptors) { Object.defineProperties(target, Object.getOwnPropertyDescriptors(source)); } else { ownKeys(Object(source)).forEach(function (key) { Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key)); }); } } return target; }
 function _createSuper(Derived) { var hasNativeReflectConstruct = _isNativeReflectConstruct(); return function _createSuperInternal() { var Super = getPrototypeOf(Derived), result; if (hasNativeReflectConstruct) { var NewTarget = getPrototypeOf(this).constructor; result = Reflect.construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return possibleConstructorReturn(this, result); }; }
 function _isNativeReflectConstruct() { if (typeof Reflect === "undefined" || !Reflect.construct) return false; if (Reflect.construct.sham) return false; if (typeof Proxy === "function") return true; try { Date.prototype.toString.call(Reflect.construct(Date, [], function () {})); return true; } catch (e) { return false; } }
-var Channel = (_class = (_temp = function (_events$EventEmitter) {
+var _id = new WeakMap();
+var _status = new WeakMap();
+var _closed = new WeakMap();
+var _stream = new WeakMap();
+var _debug = new WeakMap();
+var _closeOnDone = new WeakMap();
+var _closeOnTrap = new WeakMap();
+var _bufferedStream = new WeakMap();
+var _data = new WeakMap();
+var _read = new WeakMap();
+var _trap = new WeakMap();
+var _write = new WeakMap();
+var _sync = new WeakMap();
+var _dataBuffer = new WeakMap();
+var _buffer = new WeakMap();
+var _cmdCount = new WeakMap();
+var _cmd = new WeakMap();
+var _done = new WeakMap();
+var _clearCommand = new WeakMap();
+var _lastCommand = new WeakMap();
+var _getCommand = new WeakMap();
+var _registerCommand = new WeakMap();
+var _getStreamByEventType = new WeakMap();
+var _setupEventSubscription = new WeakMap();
+var Channel = function (_events$EventEmitter) {
   inherits(Channel, _events$EventEmitter);
   var _super = _createSuper(Channel);
   function Channel(id, stream, debug, closeOnDone) {
     var _this;
     classCallCheck(this, Channel);
     _this = _super.call(this);
-    initializerDefineProperty(_this, "id", _descriptor, assertThisInitialized(_this));
-    initializerDefineProperty(_this, "status", _descriptor2, assertThisInitialized(_this));
-    initializerDefineProperty(_this, "closed", _descriptor3, assertThisInitialized(_this));
-    initializerDefineProperty(_this, "stream", _descriptor4, assertThisInitialized(_this));
-    initializerDefineProperty(_this, "debug", _descriptor5, assertThisInitialized(_this));
-    initializerDefineProperty(_this, "closeOnDone", _descriptor6, assertThisInitialized(_this));
-    initializerDefineProperty(_this, "closeOnTrap", _descriptor7, assertThisInitialized(_this));
-    initializerDefineProperty(_this, "bufferedStream", _descriptor8, assertThisInitialized(_this));
-    initializerDefineProperty(_this, "data", _descriptor9, assertThisInitialized(_this));
-    initializerDefineProperty(_this, "read", _descriptor10, assertThisInitialized(_this));
-    initializerDefineProperty(_this, "trap", _descriptor11, assertThisInitialized(_this));
-    initializerDefineProperty(_this, "write", _descriptor12, assertThisInitialized(_this));
-    initializerDefineProperty(_this, "sync", _descriptor13, assertThisInitialized(_this));
-    initializerDefineProperty(_this, "dataBuffer", _descriptor14, assertThisInitialized(_this));
-    initializerDefineProperty(_this, "buffer", _descriptor15, assertThisInitialized(_this));
-    initializerDefineProperty(_this, "cmdCount", _descriptor16, assertThisInitialized(_this));
-    initializerDefineProperty(_this, "cmd", _descriptor17, assertThisInitialized(_this));
-    initializerDefineProperty(_this, "done", _descriptor18, assertThisInitialized(_this));
-    _this.debug = debug;
-    _this.debug & DEBUG.SILLY && console.log('Channel::New', [].slice.call(arguments));
-    _this.closeOnDone = _typeof_1(closeOnDone) === _typeof_1(true) ? closeOnDone : _this.closeOnDone;
-    _this.id = id;
-    if (_this.status & (CHANNEL.CLOSING | CHANNEL.CLOSED)) return possibleConstructorReturn(_this);
-    _this.stream = stream;
-    _this.read = stream.read.takeWhile(function (data) {
-      return !(_this.status & CHANNEL.CLOSED);
+    _status.set(assertThisInitialized(_this), CHANNEL.OPEN);
+    _closed.set(assertThisInitialized(_this), false);
+    _debug.set(assertThisInitialized(_this), DEBUG.NONE);
+    _closeOnDone.set(assertThisInitialized(_this), true);
+    _closeOnTrap.set(assertThisInitialized(_this), false);
+    _write.set(assertThisInitialized(_this), new Subject$1());
+    _sync.set(assertThisInitialized(_this), true);
+    _dataBuffer.set(assertThisInitialized(_this), {});
+    _buffer.set(assertThisInitialized(_this), []);
+    _cmdCount.set(assertThisInitialized(_this), 0);
+    _cmd.set(assertThisInitialized(_this), {});
+    _clearCommand.set(assertThisInitialized(_this), function _(commandId) {
+      if (_typeof_1(commandId) === _typeof_1({})) {
+        if (commandId.cmd) return _clearCommand.get(this)(commandId.cmd.id);
+        if (commandId.id) return _clearCommand.get(this)(commandId.id);
+        return null;
+      }
+      _debug.get(this) >= DEBUG.DEBUG && console.log("Clearing command cache for #", commandId);
+      var cmd = _cmd.get(this)[commandId];
+      if (!cmd) return;
+      delete cmd.promise.cmd;
+      delete cmd.promise.resolve;
+      delete cmd.promise.reject;
+      delete cmd.promise;
+      delete _cmd.get(this)[commandId];
+      if (!Object.keys(_cmd.get(this)).length) {
+        if (_closeOnDone.get(this)) this.close();
+      }
+    }.bind(assertThisInitialized(_this)));
+    _lastCommand.set(assertThisInitialized(_this), function _2(commandId) {
+      return _cmd.get(this)[commandId - 1];
+    }.bind(assertThisInitialized(_this)));
+    _getCommand.set(assertThisInitialized(_this), function _3(commandId) {
+      if (!commandId) return null;
+      if (_typeof_1(commandId) === _typeof_1({})) {
+        if (commandId.cmd) return commandId.cmd;else return null;
+      }
+      return _cmd.get(this)[commandId];
+    }.bind(assertThisInitialized(_this)));
+    _registerCommand.set(assertThisInitialized(_this), function _4(command, args, promise) {
+      _cmdCount.set(this, _cmdCount.get(this) + 1);
+      var commandId = _cmdCount.get(this);
+      _cmd.get(this)[commandId] = {
+        id: commandId,
+        cmd: {
+          id: commandId,
+          command: command,
+          args: args
+        },
+        promise: promise
+      };
+      (function (id, p) {
+        var _this2 = this;
+        var race = Observable$1.race(_done.get(this).filter(function (data) {
+          return data.cmd && data.cmd.id === id;
+        })
+        .take(1), _trap.get(this).filter(function (data) {
+          return data.cmd && data.cmd.id === id;
+        })
+        .take(1)).take(1);
+        race.partition(function (data) {
+          return data.type == EVENT.TRAP || data.type === EVENT.TRAP_TAG;
+        }).reduce(function (r, o, i) {
+          if (i == 0) {
+            o.subscribe(function (error) {
+              _debug.get(_this2) >= DEBUG.DEBUG && console.error("*** Register Command: trap", id, error);
+              _status.set(_this2, CHANNEL.DONE);
+              if (_closeOnTrap.get(_this2)) {
+                _status.set(_this2, CHANNEL.CLOSING);
+                _debug.get(_this2) >= DEBUG.DEBUG && console.log('Channel (%s):: read-done catch CLOSING', _id.get(_this2));
+                _this2.close(true);
+              }
+              p.reject(error);
+              _this2.emit('trap', error);
+            }, null);
+          } else return o;
+        }, {});
+        var isListen = command.split('/').indexOf('listen') > 0;
+        _data.get(this).filter(function (data) {
+          return data.cmd.id === id;
+        }).takeUntil(race)["do"](function (d) {
+          return _debug.get(_this2) >= DEBUG.SILLY && console.log("*** Data in %s:%s", d.cmd.id, id);
+        }).reduce(function (acc, d) {
+          if (d.data && !isListen) acc.data = acc.data.concat([d.data]);
+          return acc;
+        }, {
+          cmd: _cmd.get(this)[id].cmd,
+          tag: _id.get(this),
+          data: []
+        })["do"](function (d) {
+          return _debug.get(_this2) >= DEBUG.SILLY && console.log("*** Reduced Data in ", d);
+        }).takeUntil(race.filter(function (data) {
+          return data.type == EVENT.TRAP || data.type === EVENT.TRAP_TAG;
+        })).subscribe(function (data) {
+          _debug.get(_this2) >= DEBUG.SILLY && console.log("*** Register Command: subscribe", id, data);
+          _status.set(_this2, CHANNEL.DONE);
+          _bufferedStream.get(_this2).next(data);
+          p.resolve(data);
+          _this2.emit('done', data);
+        }, function (error) {
+          _debug.get(_this2) >= DEBUG.SILLY && console.error("*** Register Command: error", id, error);
+        },
+        function () {
+          _debug.get(_this2) >= DEBUG.SILLY && console.log("*** Register Command: complete", commandId);
+          setTimeout(function () {
+            return _clearCommand.get(_this2)(id);
+          }, 50);
+        });
+      }).bind(this)(commandId, promise);
+      return _cmd.get(this)[commandId].cmd;
+    }.bind(assertThisInitialized(_this)));
+    _getStreamByEventType.set(assertThisInitialized(_this), function _5(event) {
+      switch (event) {
+        case EVENT.DONE:
+          return _bufferedStream.get(this);
+        case EVENT.TRAP:
+          return _trap.get(this);
+        case EVENT.FATAL:
+          return this.fatal;
+        default:
+          return _read.get(this);
+      }
+    }.bind(assertThisInitialized(_this)));
+    _setupEventSubscription.set(assertThisInitialized(_this), function _6(event, stream) {
+      var _this3 = this;
+      if (this.listeners(event)) return;
+      var listenerStream = stream.takeWhile(function (o) {
+        return !_this3.listeners(event);
+      });
+      listenerStream.subscribe(function (e) {
+        _this3.emit(event, e);
+      });
+      return listenerStream;
+    }.bind(assertThisInitialized(_this)));
+    _debug.set(assertThisInitialized(_this), debug);
+    _debug.get(assertThisInitialized(_this)) & DEBUG.SILLY && console.log('Channel::New', [].slice.call(arguments));
+    _closeOnDone.set(assertThisInitialized(_this), _typeof_1(closeOnDone) === _typeof_1(true) ? closeOnDone : _closeOnDone.get(assertThisInitialized(_this)));
+    _id.set(assertThisInitialized(_this), id);
+    if (_status.get(assertThisInitialized(_this)) & (CHANNEL.CLOSING | CHANNEL.CLOSED)) return possibleConstructorReturn(_this);
+    _stream.set(assertThisInitialized(_this), stream);
+    _read.set(assertThisInitialized(_this), stream.read.takeWhile(function (data) {
+      return !(_status.get(assertThisInitialized(_this)) & CHANNEL.CLOSED);
     })["do"](function (e) {
-      return _this.debug >= DEBUG.SILLY && console.log('Channel (%s)::%s Sentence on channel ', e.tag);
+      return _debug.get(assertThisInitialized(_this)) >= DEBUG.SILLY && console.log('Channel (%s)::%s Sentence on channel ', e.tag);
     }).flatMap(function (data) {
       var cmd = _this.getCommandId(data);
       var d = _objectSpread(_objectSpread({}, data), {}, {
         tag: data.tag.substring(0, data.tag.lastIndexOf('-')),
-        cmd: (_this.getCommand(cmd) || {
+        cmd: (_getCommand.get(assertThisInitialized(_this))(cmd) || {
           cmd: null
         }).cmd
       });
@@ -15601,34 +15724,34 @@ var Channel = (_class = (_temp = function (_events$EventEmitter) {
         return Observable$1.of(d2).concat(Observable$1.of(d));
       }
       return Observable$1.of(d);
-    }).share();
-    _this.data = _this.createStream(_this.read, [EVENT.DATA, EVENT.DATA_RET, EVENT.DATA_RET_TAG]).share();
-    _this.done = _this.createStream(_this.read, [EVENT.DONE, EVENT.DONE_RET, EVENT.DONE_TAG]).share();
-    _this.trap = _this.read.filter(function (e) {
+    }).share());
+    _data.set(assertThisInitialized(_this), _this.createStream(_read.get(assertThisInitialized(_this)), [EVENT.DATA, EVENT.DATA_RET, EVENT.DATA_RET_TAG]).share());
+    _done.set(assertThisInitialized(_this), _this.createStream(_read.get(assertThisInitialized(_this)), [EVENT.DONE, EVENT.DONE_RET, EVENT.DONE_TAG]).share());
+    _trap.set(assertThisInitialized(_this), _read.get(assertThisInitialized(_this)).filter(function (e) {
       return e.type == EVENT.TRAP || e.type === EVENT.TRAP_TAG;
     })["do"](function (e) {
-      return _this.debug >= DEBUG.DEBUG && console.log('Channel (%s)::TRAP ', id);
-    }).share();
-    _this.read.filter(function (e) {
+      return _debug.get(assertThisInitialized(_this)) >= DEBUG.DEBUG && console.log('Channel (%s)::TRAP ', id);
+    }).share());
+    _read.get(assertThisInitialized(_this)).filter(function (e) {
       return e.type == EVENT.FATAL;
     }).subscribe(function (e) {
-      _this.debug >= DEBUG.DEBUG && console.log('Channel (%s)::FATAL ', id);
-      _this.status = CHANNEL.CLOSING;
+      _debug.get(assertThisInitialized(_this)) >= DEBUG.DEBUG && console.log('Channel (%s)::FATAL ', id);
+      _status.set(assertThisInitialized(_this), CHANNEL.CLOSING);
       _this.close();
     });
-    _this.bufferedStream = new Subject$1();
+    _bufferedStream.set(assertThisInitialized(_this), new Subject$1());
     return _this;
   }
   createClass(Channel, [{
     key: "write",
     value: function write(command) {
-      var _this2 = this;
+      var _this4 = this;
       var args = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : [];
-      if (this.status & (CHANNEL.CLOSED | CHANNEL.CLOSING)) {
-        this.debug >= DEBUG.WARN && console.error("Cannot write on closed or closing channel");
+      if (_status.get(this) & (CHANNEL.CLOSED | CHANNEL.CLOSING)) {
+        _debug.get(this) >= DEBUG.WARN && console.error("Cannot write on closed or closing channel");
         var p = new Promise(function (resolve, reject) {
           return reject({
-            tag: _this2.id,
+            tag: _id.get(_this4),
             data: {
               message: "Cannot write on closed or closing channel"
             },
@@ -15641,11 +15764,11 @@ var Channel = (_class = (_temp = function (_events$EventEmitter) {
         return p;
       }
       if (command === '/cancel') {
-        Object.keys(this.cmd).forEach(function (id) {
-          _this2.stream.write(command, args, id);
+        Object.keys(_cmd.get(this)).forEach(function (id) {
+          _stream.get(_this4).write(command, args, id);
         });
         return Promise.resolve({
-          tag: this.id,
+          tag: _id.get(this),
           data: {
             message: "/cancel sent."
           }
@@ -15657,144 +15780,36 @@ var Channel = (_class = (_temp = function (_events$EventEmitter) {
           reject = _getUnwrappedPromise.reject;
       promise.resolve = resolve;
       promise.reject = reject;
-      var cmd = this.registerCommand(command, args, promise);
+      var cmd = _registerCommand.get(this)(command, args, promise);
       var commandId = cmd.id;
       promise.cmd = cmd;
-      if (Object.keys(this.cmd).length - 1 == 0 && !(this.sync && this.status & CHANNEL.RUNNING)) {
-        this.status = CHANNEL.RUNNING;
-        this.debug >= DEBUG.INFO && console.log("Writing on channel %s", this.id, command, args);
-        this.stream.write(command, args, commandId);
+      if (Object.keys(_cmd.get(this)).length - 1 == 0 && !(_sync.get(this) && _status.get(this) & CHANNEL.RUNNING)) {
+        _status.set(this, CHANNEL.RUNNING);
+        _debug.get(this) >= DEBUG.INFO && console.log("Writing on channel %s", _id.get(this), command, args);
+        _stream.get(this).write(command, args, commandId);
       } else {
-        var last = this.lastCommand(commandId);
-        if (this.sync) last.promise.then(function () {
-          _this2.status = CHANNEL.RUNNING;
-          _this2.stream.write(command, args, commandId);
+        var last = _lastCommand.get(this)(commandId);
+        if (_sync.get(this)) last.promise.then(function () {
+          _status.set(_this4, CHANNEL.RUNNING);
+          _stream.get(_this4).write(command, args, commandId);
         })["catch"](function () {
-          _this2.stream.write(command, args, commandId);
+          _stream.get(_this4).write(command, args, commandId);
         });
         else {
-            this.status = CHANNEL.RUNNING;
-            this.stream.write(command, args, commandId);
+            _status.set(this, CHANNEL.RUNNING);
+            _stream.get(this).write(command, args, commandId);
           }
       }
       return promise;
     }
   }, {
-    key: "clearCommand",
-    value: function clearCommand(commandId) {
-      if (_typeof_1(commandId) === _typeof_1({})) {
-        if (commandId.cmd) return this.clearCommand(commandId.cmd.id);
-        if (commandId.id) return this.clearCommand(commandId.id);
-        return null;
-      }
-      this.debug >= DEBUG.DEBUG && console.log("Clearing command cache for #", commandId);
-      var cmd = this.cmd[commandId];
-      if (!cmd) return;
-      delete cmd.promise.cmd;
-      delete cmd.promise.resolve;
-      delete cmd.promise.reject;
-      delete cmd.promise;
-      delete this.cmd[commandId];
-      if (!Object.keys(this.cmd).length) {
-        if (this.closeOnDone) this.close();
-      }
-    }
-  }, {
-    key: "lastCommand",
-    value: function lastCommand(commandId) {
-      return this.cmd[commandId - 1];
-    }
-  }, {
-    key: "getCommand",
-    value: function getCommand(commandId) {
-      if (!commandId) return null;
-      if (_typeof_1(commandId) === _typeof_1({})) {
-        if (commandId.cmd) return commandId.cmd;else return null;
-      }
-      return this.cmd[commandId];
-    }
-  }, {
-    key: "registerCommand",
-    value: function registerCommand(command, args, promise) {
-      this.cmdCount = this.cmdCount + 1;
-      var commandId = this.cmdCount;
-      this.cmd[commandId] = {
-        id: commandId,
-        cmd: {
-          id: commandId,
-          command: command,
-          args: args
-        },
-        promise: promise
-      };
-      (function (id, p) {
-        var _this3 = this;
-        var race = Observable$1.race(this.done.filter(function (data) {
-          return data.cmd && data.cmd.id === id;
-        })
-        .take(1), this.trap.filter(function (data) {
-          return data.cmd && data.cmd.id === id;
-        })
-        .take(1)).take(1);
-        race.partition(function (data) {
-          return data.type == EVENT.TRAP || data.type === EVENT.TRAP_TAG;
-        }).reduce(function (r, o, i) {
-          if (i == 0) {
-            o.subscribe(function (error) {
-              _this3.debug >= DEBUG.DEBUG && console.error("*** Register Command: trap", id, error);
-              _this3.status = CHANNEL.DONE;
-              if (_this3.closeOnTrap) {
-                _this3.status = CHANNEL.CLOSING;
-                _this3.debug >= DEBUG.DEBUG && console.log('Channel (%s):: read-done catch CLOSING', _this3.id);
-                _this3.close(true);
-              }
-              p.reject(error);
-              _this3.emit('trap', error);
-            }, null);
-          } else return o;
-        }, {});
-        var isListen = command.split('/').indexOf('listen') > 0;
-        this.data.filter(function (data) {
-          return data.cmd.id === id;
-        }).takeUntil(race)["do"](function (d) {
-          return _this3.debug >= DEBUG.SILLY && console.log("*** Data in %s:%s", d.cmd.id, id);
-        }).reduce(function (acc, d) {
-          if (d.data && !isListen) acc.data = acc.data.concat([d.data]);
-          return acc;
-        }, {
-          cmd: this.cmd[id].cmd,
-          tag: this.id,
-          data: []
-        })["do"](function (d) {
-          return _this3.debug >= DEBUG.SILLY && console.log("*** Reduced Data in ", d);
-        }).takeUntil(race.filter(function (data) {
-          return data.type == EVENT.TRAP || data.type === EVENT.TRAP_TAG;
-        })).subscribe(function (data) {
-          _this3.debug >= DEBUG.SILLY && console.log("*** Register Command: subscribe", id, data);
-          _this3.status = CHANNEL.DONE;
-          _this3.bufferedStream.next(data);
-          p.resolve(data);
-          _this3.emit('done', data);
-        }, function (error) {
-          _this3.debug >= DEBUG.SILLY && console.error("*** Register Command: error", id, error);
-        },
-        function () {
-          _this3.debug >= DEBUG.SILLY && console.log("*** Register Command: complete", commandId);
-          setTimeout(function () {
-            return _this3.clearCommand(id);
-          }, 50);
-        });
-      }).bind(this)(commandId, promise);
-      return this.cmd[commandId].cmd;
-    }
-  }, {
     key: "createStream",
     value: function createStream(stream, events) {
-      var _this4 = this;
-      return this.read.filter(function (e) {
+      var _this5 = this;
+      return _read.get(this).filter(function (e) {
         return events.indexOf(e.type) != -1;
       })["do"](function (e) {
-        return _this4.debug >= DEBUG.DEBUG && console.log('Channel (%s)::%s flatMap', e.tag, e.type);
+        return _debug.get(_this5) >= DEBUG.DEBUG && console.log('Channel (%s)::%s flatMap', e.tag, e.type);
       }).flatMap(function (d) {
         return Observable$1.of(d);
       });
@@ -15809,21 +15824,21 @@ var Channel = (_class = (_temp = function (_events$EventEmitter) {
   }, {
     key: "close",
     value: function close(force) {
-      var _this5 = this;
-      if (this.status & CHANNEL.RUNNING) {
-        if (force) Object.keys(this.cmd).forEach(function (id) {
-          _this5.stream.write('/cancel', [], id);
+      var _this6 = this;
+      if (_status.get(this) & CHANNEL.RUNNING) {
+        if (force) Object.keys(_cmd.get(this)).forEach(function (id) {
+          _stream.get(_this6).write('/cancel', [], id);
         });
-        this.closeOnDone = true;
-        this.sync = true;
-        this.status = CHANNEL.CLOSING;
+        _closeOnDone.set(this, true);
+        _sync.set(this, true);
+        _status.set(this, CHANNEL.CLOSING);
         return;
       }
-      if (this.status & CHANNEL.CLOSED) return;
-      this.status = CHANNEL.CLOSED;
-      this.debug >= DEBUG.INFO && console.log('Channel (%s)::CLOSED', this.id);
-      this.bufferedStream.complete();
-      this.stream.close();
+      if (_status.get(this) & CHANNEL.CLOSED) return;
+      _status.set(this, CHANNEL.CLOSED);
+      _debug.get(this) >= DEBUG.INFO && console.log('Channel (%s)::CLOSED', _id.get(this));
+      _bufferedStream.get(this).complete();
+      _stream.get(this).close();
       this.removeAllListeners(EVENT.DONE);
       this.removeAllListeners(EVENT.DATA);
       this.removeAllListeners(EVENT.TRAP);
@@ -15832,256 +15847,121 @@ var Channel = (_class = (_temp = function (_events$EventEmitter) {
     key: "sync",
     value: function sync() {
       if (arguments.length) {
-        this.sync = !!(arguments.length <= 0 ? undefined : arguments[0]);
+        _sync.set(this, !!(arguments.length <= 0 ? undefined : arguments[0]));
         return this;
       }
-      return this.sync;
+      return _sync.get(this);
     }
   }, {
     key: "pipeFrom",
     value: function pipeFrom(stream) {
-      var _this6 = this;
-      if (this.status & (CHANNEL.DONE | CHANNEL.OPEN)) {
-        this.status = CHANNEL.RUNNING;
+      var _this7 = this;
+      if (_status.get(this) & (CHANNEL.DONE | CHANNEL.OPEN)) {
+        _status.set(this, CHANNEL.RUNNING);
         stream.takeWhile(function (o) {
-          return !(_this6.status & (CHANNEL.FATAL | CHANNEL.CLOSING | CHANNEL.CLOSED));
+          return !(_status.get(_this7) & (CHANNEL.FATAL | CHANNEL.CLOSING | CHANNEL.CLOSED));
         }).subscribe(function (d) {
-          return _this6.write(d);
+          return _write.get(_this7)(d);
         }, function () {
-          _this6.status = CHANNEL.DONE;
-          _this6.stream.close();
+          _status.set(_this7, CHANNEL.DONE);
+          _stream.get(_this7).close();
         }, function () {
-          _this6.status = CHANNEL.DONE;
-          _this6.stream.close();
+          _status.set(_this7, CHANNEL.DONE);
+          _stream.get(_this7).close();
         });
       }
     }
   }, {
     key: "getId",
     value: function getId() {
-      return this.id;
+      return _id.get(this);
     }
   }, {
     key: "on",
     value: function on(event, func) {
       var ret = get(getPrototypeOf(Channel.prototype), "on", this).call(this, event, func);
-      this.setupEventSubscription(event, this.getStreamByEventType(event));
+      _setupEventSubscription.get(this)(event, _getStreamByEventType.get(this)(event));
       return ret;
     }
   }, {
     key: "addEventListener",
     value: function addEventListener(event, func) {
       var ret = get(getPrototypeOf(Channel.prototype), "addEventListener", this).call(this, event, func);
-      this.setupEventSubscription(event, this.getStreamByEventType(event));
+      _setupEventSubscription.get(this)(event, _getStreamByEventType.get(this)(event));
       return ret;
     }
   }, {
     key: "once",
     value: function once(event, func) {
       var ret = get(getPrototypeOf(Channel.prototype), "once", this).call(this, event, func);
-      this.setupEventSubscription(event, this.getStreamByEventType(event));
+      _setupEventSubscription.get(this)(event, _getStreamByEventType.get(this)(event));
       return ret;
-    }
-  }, {
-    key: "getStreamByEventType",
-    value: function getStreamByEventType(event) {
-      switch (event) {
-        case EVENT.DONE:
-          return this.bufferedStream;
-        case EVENT.TRAP:
-          return this.trap;
-        case EVENT.FATAL:
-          return this.fatal;
-        default:
-          return this.read;
-      }
-    }
-  }, {
-    key: "setupEventSubscription",
-    value: function setupEventSubscription(event, stream) {
-      var _this7 = this;
-      if (this.listeners(event)) return;
-      var listenerStream = stream.takeWhile(function (o) {
-        return !_this7.listeners(event);
-      });
-      listenerStream.subscribe(function (e) {
-        _this7.emit(event, e);
-      });
-      return listenerStream;
     }
   }, {
     key: "closeOnDone",
     value: function closeOnDone() {
-      if (arguments.length) this.closeOnDone = !!(arguments.length <= 0 ? undefined : arguments[0]);else this.closeOnDone;
+      if (arguments.length) _closeOnDone.set(this, !!(arguments.length <= 0 ? undefined : arguments[0]));else _closeOnDone.get(this);
       return this;
     }
   }, {
     key: "closeOnTrap",
     value: function closeOnTrap() {
-      if (arguments.length) this.closeOnTrap = !!(arguments.length <= 0 ? undefined : arguments[0]);else return this.closeOnTrap;
+      if (arguments.length) _closeOnTrap.set(this, !!(arguments.length <= 0 ? undefined : arguments[0]));else return _closeOnTrap.get(this);
       return this;
     }
   }, {
     key: "data",
     get: function get() {
-      return this.data;
+      return _data.get(this);
     }
   }, {
     key: "done",
     get: function get() {
-      return this.bufferedStream;
+      return _bufferedStream.get(this);
     }
   }, {
     key: "trap",
     get: function get() {
-      return this.trap;
+      return _trap.get(this);
     }
   }, {
     key: "stream",
     get: function get() {
-      return this.read;
+      return _read.get(this);
     }
   }, {
     key: "status",
     get: function get() {
-      return this.status;
+      return _status.get(this);
     }
   }]);
   return Channel;
-}(events.EventEmitter), _temp), (_descriptor = applyDecoratedDescriptor(_class.prototype, "id", [Private], {
-  configurable: true,
-  enumerable: true,
-  writable: true,
-  initializer: null
-}), _descriptor2 = applyDecoratedDescriptor(_class.prototype, "status", [Private], {
-  configurable: true,
-  enumerable: true,
-  writable: true,
-  initializer: function initializer() {
-    return CHANNEL.OPEN;
-  }
-}), _descriptor3 = applyDecoratedDescriptor(_class.prototype, "closed", [Private], {
-  configurable: true,
-  enumerable: true,
-  writable: true,
-  initializer: function initializer() {
-    return false;
-  }
-}), _descriptor4 = applyDecoratedDescriptor(_class.prototype, "stream", [Private], {
-  configurable: true,
-  enumerable: true,
-  writable: true,
-  initializer: null
-}), _descriptor5 = applyDecoratedDescriptor(_class.prototype, "debug", [Private], {
-  configurable: true,
-  enumerable: true,
-  writable: true,
-  initializer: function initializer() {
-    return DEBUG.NONE;
-  }
-}), _descriptor6 = applyDecoratedDescriptor(_class.prototype, "closeOnDone", [Private], {
-  configurable: true,
-  enumerable: true,
-  writable: true,
-  initializer: function initializer() {
-    return true;
-  }
-}), _descriptor7 = applyDecoratedDescriptor(_class.prototype, "closeOnTrap", [Private], {
-  configurable: true,
-  enumerable: true,
-  writable: true,
-  initializer: function initializer() {
-    return false;
-  }
-}), _descriptor8 = applyDecoratedDescriptor(_class.prototype, "bufferedStream", [Private], {
-  configurable: true,
-  enumerable: true,
-  writable: true,
-  initializer: null
-}), _descriptor9 = applyDecoratedDescriptor(_class.prototype, "data", [Private], {
-  configurable: true,
-  enumerable: true,
-  writable: true,
-  initializer: null
-}), _descriptor10 = applyDecoratedDescriptor(_class.prototype, "read", [Private], {
-  configurable: true,
-  enumerable: true,
-  writable: true,
-  initializer: null
-}), _descriptor11 = applyDecoratedDescriptor(_class.prototype, "trap", [Private], {
-  configurable: true,
-  enumerable: true,
-  writable: true,
-  initializer: null
-}), _descriptor12 = applyDecoratedDescriptor(_class.prototype, "write", [Private], {
-  configurable: true,
-  enumerable: true,
-  writable: true,
-  initializer: function initializer() {
-    return new Subject$1();
-  }
-}), _descriptor13 = applyDecoratedDescriptor(_class.prototype, "sync", [Private], {
-  configurable: true,
-  enumerable: true,
-  writable: true,
-  initializer: function initializer() {
-    return true;
-  }
-}), _descriptor14 = applyDecoratedDescriptor(_class.prototype, "dataBuffer", [Private], {
-  configurable: true,
-  enumerable: true,
-  writable: true,
-  initializer: function initializer() {
-    return {};
-  }
-}), _descriptor15 = applyDecoratedDescriptor(_class.prototype, "buffer", [Private], {
-  configurable: true,
-  enumerable: true,
-  writable: true,
-  initializer: function initializer() {
-    return [];
-  }
-}), _descriptor16 = applyDecoratedDescriptor(_class.prototype, "cmdCount", [Private], {
-  configurable: true,
-  enumerable: true,
-  writable: true,
-  initializer: function initializer() {
-    return 0;
-  }
-}), _descriptor17 = applyDecoratedDescriptor(_class.prototype, "cmd", [Private], {
-  configurable: true,
-  enumerable: true,
-  writable: true,
-  initializer: function initializer() {
-    return {};
-  }
-}), _descriptor18 = applyDecoratedDescriptor(_class.prototype, "done", [Private], {
-  configurable: true,
-  enumerable: true,
-  writable: true,
-  initializer: null
-}), applyDecoratedDescriptor(_class.prototype, "clearCommand", [Private], Object.getOwnPropertyDescriptor(_class.prototype, "clearCommand"), _class.prototype), applyDecoratedDescriptor(_class.prototype, "lastCommand", [Private], Object.getOwnPropertyDescriptor(_class.prototype, "lastCommand"), _class.prototype), applyDecoratedDescriptor(_class.prototype, "getCommand", [Private], Object.getOwnPropertyDescriptor(_class.prototype, "getCommand"), _class.prototype), applyDecoratedDescriptor(_class.prototype, "registerCommand", [Private], Object.getOwnPropertyDescriptor(_class.prototype, "registerCommand"), _class.prototype), applyDecoratedDescriptor(_class.prototype, "getStreamByEventType", [Private], Object.getOwnPropertyDescriptor(_class.prototype, "getStreamByEventType"), _class.prototype), applyDecoratedDescriptor(_class.prototype, "setupEventSubscription", [Private], Object.getOwnPropertyDescriptor(_class.prototype, "setupEventSubscription"), _class.prototype)), _class);
+}(events.EventEmitter);
 
-var _class$1, _descriptor$1, _descriptor2$1, _descriptor3$1, _descriptor4$1, _descriptor5$1, _temp$1;
+var _class;
 function _createSuper$1(Derived) { var hasNativeReflectConstruct = _isNativeReflectConstruct$1(); return function _createSuperInternal() { var Super = getPrototypeOf(Derived), result; if (hasNativeReflectConstruct) { var NewTarget = getPrototypeOf(this).constructor; result = Reflect.construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return possibleConstructorReturn(this, result); }; }
 function _isNativeReflectConstruct$1() { if (typeof Reflect === "undefined" || !Reflect.construct) return false; if (Reflect.construct.sham) return false; if (typeof Proxy === "function") return true; try { Date.prototype.toString.call(Reflect.construct(Date, [], function () {})); return true; } catch (e) { return false; } }
-var Connection = (_class$1 = (_temp$1 = function (_events$EventEmitter) {
+var _status$1 = new WeakMap();
+var _channels = new WeakMap();
+var _stream$1 = new WeakMap();
+var _debug$1 = new WeakMap();
+var _closeOnDone$1 = new WeakMap();
+var Connection = (_class = function (_events$EventEmitter) {
   inherits(Connection, _events$EventEmitter);
   var _super = _createSuper$1(Connection);
   function Connection(stream, loginHandler, p) {
     var _this;
     classCallCheck(this, Connection);
     _this = _super.call(this);
-    initializerDefineProperty(_this, "status", _descriptor$1, assertThisInitialized(_this));
-    initializerDefineProperty(_this, "channels", _descriptor2$1, assertThisInitialized(_this));
-    initializerDefineProperty(_this, "stream", _descriptor3$1, assertThisInitialized(_this));
-    initializerDefineProperty(_this, "debug", _descriptor4$1, assertThisInitialized(_this));
-    initializerDefineProperty(_this, "closeOnDone", _descriptor5$1, assertThisInitialized(_this));
+    _status$1.set(assertThisInitialized(_this), CONNECTION.NONE);
+    _channels.set(assertThisInitialized(_this), []);
+    _debug$1.set(assertThisInitialized(_this), DEBUG.NONE);
+    _closeOnDone$1.set(assertThisInitialized(_this), false);
     var login = stream.read
     .takeWhile(function (o) {
-      return _this.status !== CONNECTION.CONNECTED;
+      return _status$1.get(assertThisInitialized(_this)) !== CONNECTION.CONNECTED;
     }).share();
-    _this.stream = stream;
+    _stream$1.set(assertThisInitialized(_this), stream);
     var rejectAndClose = function rejectAndClose(d) {
       p.reject(d);
       _this.close();
@@ -16090,24 +15970,24 @@ var Connection = (_class$1 = (_temp$1 = function (_events$EventEmitter) {
       return d.type === EVENT.TRAP;
     })["do"](function (t) {
       _this.emit('trap', t.data);
-      _this.debug && console.log('Trap during login: ', t.data);
+      _debug$1.get(assertThisInitialized(_this)) && console.log('Trap during login: ', t.data);
     }).map(function (t) {
       return t.data;
     }).subscribe(rejectAndClose, rejectAndClose);
     login.filter(function (d) {
       return d.type === EVENT.DONE_RET;
     }).subscribe(function (data) {
-      _this.status = CONNECTION.CONNECTING;
-      _this.debug >= DEBUG.DEBUG && console.log("Got done_ret, building response to ", data);
+      _status$1.set(assertThisInitialized(_this), CONNECTION.CONNECTING);
+      _debug$1.get(assertThisInitialized(_this)) >= DEBUG.DEBUG && console.log("Got done_ret, building response to ", data);
       var a = data.data.split('');
       var challenge = [];
       while (a.length) {
         challenge.push(parseInt("0x" + a.shift() + a.shift()));
       }
-      _this.debug >= DEBUG.DEBUG && console.log('Challenge length:' + challenge.length);
+      _debug$1.get(assertThisInitialized(_this)) >= DEBUG.DEBUG && console.log('Challenge length:' + challenge.length);
       if (challenge.length != 16) {
-        _this.status = CONNECTION.ERROR;
-        _this.debug >= DEBUG.WARN && console.log(_this.status);
+        _status$1.set(assertThisInitialized(_this), CONNECTION.ERROR);
+        _debug$1.get(assertThisInitialized(_this)) >= DEBUG.WARN && console.log(_status$1.get(assertThisInitialized(_this)));
         stream.sentence.error('Bad Connection Response: ' + data);
       } else {
         loginHandler(challenge);
@@ -16116,14 +15996,14 @@ var Connection = (_class$1 = (_temp$1 = function (_events$EventEmitter) {
     login.filter(function (d) {
       return d.type === EVENT.DONE;
     }).subscribe(function (d) {
-      _this.status = CONNECTION.CONNECTED;
-      _this.debug >= DEBUG.INFO && console.log('Login complete: Connected');
+      _status$1.set(assertThisInitialized(_this), CONNECTION.CONNECTED);
+      _debug$1.get(assertThisInitialized(_this)) >= DEBUG.INFO && console.log('Login complete: Connected');
       p.resolve(assertThisInitialized(_this));
     }, rejectAndClose, function () {
-      _this.debug >= DEBUG.DEBUG && console.log("Login stream complete");
+      _debug$1.get(assertThisInitialized(_this)) >= DEBUG.DEBUG && console.log("Login stream complete");
     });
     stream.read.subscribe(null, null, function (e) {
-      _this.channels.forEach(function (c) {
+      _channels.get(assertThisInitialized(_this)).forEach(function (c) {
         return c.close(true);
       });
       setTimeout(function () {
@@ -16135,32 +16015,32 @@ var Connection = (_class$1 = (_temp$1 = function (_events$EventEmitter) {
   createClass(Connection, [{
     key: "close",
     value: function close() {
-      this.debug >= DEBUG.SILLY && console.log("Closing connection through stream");
+      _debug$1.get(this) >= DEBUG.SILLY && console.log("Closing connection through stream");
       this.emit('close', this);
-      this.stream.close();
+      _stream$1.get(this).close();
     }
   }, {
     key: "setDebug",
     value: function setDebug(d) {
-      this.debug = d;
+      _debug$1.set(this, d);
       return this;
     }
   }, {
     key: "debug",
     value: function debug() {
-      if (arguments.length) this.debug = arguments.length <= 0 ? undefined : arguments[0];else return this.debug;
+      if (arguments.length) _debug$1.set(this, arguments.length <= 0 ? undefined : arguments[0]);else return _debug$1.get(this);
       return this;
     }
   }, {
     key: "closeOnDone",
     value: function closeOnDone() {
-      if (arguments.length) this.closeOnDone = !!(arguments.length <= 0 ? undefined : arguments[0]);else return this.closeOnDone;
+      if (arguments.length) _closeOnDone$1.set(this, !!(arguments.length <= 0 ? undefined : arguments[0]));else return _closeOnDone$1.get(this);
       return this;
     }
   }, {
     key: "getChannel",
     value: function getChannel(id) {
-      return this.channels.filter(function (c) {
+      return _channels.get(this).filter(function (c) {
         return c.getId() == id;
       })[0];
     }
@@ -16168,18 +16048,18 @@ var Connection = (_class$1 = (_temp$1 = function (_events$EventEmitter) {
     key: "openChannel",
     value: function openChannel(id, closeOnDone) {
       var _this2 = this;
-      this.debug >= DEBUG.SILLY && console.log("Connection::OpenChannel");
+      _debug$1.get(this) >= DEBUG.SILLY && console.log("Connection::OpenChannel");
       if (!id) {
         id = +new Date();
       } else {
-        if (this.channels.some(function (c) {
+        if (_channels.get(this).some(function (c) {
           return c.getId() === id;
         })) throw 'Channel already exists for ID ' + id;
       }
-      this.debug >= DEBUG.SILLY && console.log("Creating proxy stream");
+      _debug$1.get(this) >= DEBUG.SILLY && console.log("Creating proxy stream");
       var matchId = RegExp("^" + id + "-");
       var s = {
-        "read": this.stream.read.filter(function (e) {
+        "read": _stream$1.get(this).read.filter(function (e) {
           return matchId.test(e.tag);
         }),
         "write": function write(d, args) {
@@ -16187,28 +16067,28 @@ var Connection = (_class$1 = (_temp$1 = function (_events$EventEmitter) {
           if (_typeof_1(d) === STRING_TYPE) d = d.split("\n");
           if (Array.isArray(d) && d.length) {
             d.push(".tag=".concat(id, "-").concat(cmdTrack));
-            return _this2.stream.write(d, args);
+            return _stream$1.get(_this2).write(d, args);
           } else return;
         },
         "close": function close() {
           var channel = _this2.getChannel(id);
           if (channel) {
-            _this2.debug >= DEBUG.DEBUG && console.log("Closing channel ", id);
+            _debug$1.get(_this2) >= DEBUG.DEBUG && console.log("Closing channel ", id);
             setTimeout(channel.emit.bind(channel, 'close', channel), 50);
-            _this2.channels.splice(_this2.channels.indexOf(channel), 1);
-            if (_this2.channels.filter(function (c) {
+            _channels.get(_this2).splice(_channels.get(_this2).indexOf(channel), 1);
+            if (_channels.get(_this2).filter(function (c) {
               return c.status & (CHANNEL.OPEN | CHANNEL.RUNNING);
-            }).length === 0 && _this2.closeOnDone) _this2.close();
-          } else _this2.debug >= DEBUG.WARN && console.log("Could not find channel %s when trying to close", id);
+            }).length === 0 && _closeOnDone$1.get(_this2)) _this2.close();
+          } else _debug$1.get(_this2) >= DEBUG.WARN && console.log("Could not find channel %s when trying to close", id);
         },
         "done": function done() {
-          if (_this2.closeOnDone) {
-            var cl = _this2.channels.filter(function (c) {
+          if (_closeOnDone$1.get(_this2)) {
+            var cl = _channels.get(_this2).filter(function (c) {
               return c.status & (CHANNEL.OPEN | CHANNEL.RUNNING);
             });
             if (cl.length) return false;
-            _this2.debug >= DEBUG.DEBUG && console.log("Channel done (%s)", id);
-            _this2.channels.filter(function (c) {
+            _debug$1.get(_this2) >= DEBUG.DEBUG && console.log("Channel done (%s)", id);
+            _channels.get(_this2).filter(function (c) {
               return c.status & CHANNEL.DONE;
             }).forEach(function (c) {
               return console.log("Closing...", c);
@@ -16219,129 +16099,101 @@ var Connection = (_class$1 = (_temp$1 = function (_events$EventEmitter) {
         }
       };
       var c;
-      this.debug >= DEBUG.INFO && console.log("Creating channel ", id);
-      this.channels.push(c = new Channel(id, s, this.debug, closeOnDone));
-      this.debug >= DEBUG.INFO && console.log("Channel %s Created", id);
+      _debug$1.get(this) >= DEBUG.INFO && console.log("Creating channel ", id);
+      _channels.get(this).push(c = new Channel(id, s, _debug$1.get(this), closeOnDone));
+      _debug$1.get(this) >= DEBUG.INFO && console.log("Channel %s Created", id);
       return c;
     }
   }, {
     key: "connected",
     get: function get() {
-      return !!(this.status & (CONNECTION.CONNECTED | CONNECTION.WAITING | CONNECTION.CLOSING));
+      return !!(_status$1.get(this) & (CONNECTION.CONNECTED | CONNECTION.WAITING | CONNECTION.CLOSING));
     }
   }]);
   return Connection;
-}(events.EventEmitter), _temp$1), (_descriptor$1 = applyDecoratedDescriptor(_class$1.prototype, "status", [Private], {
-  configurable: true,
-  enumerable: true,
-  writable: true,
-  initializer: function initializer() {
-    return CONNECTION.NONE;
-  }
-}), _descriptor2$1 = applyDecoratedDescriptor(_class$1.prototype, "channels", [Private], {
-  configurable: true,
-  enumerable: true,
-  writable: true,
-  initializer: function initializer() {
-    return [];
-  }
-}), _descriptor3$1 = applyDecoratedDescriptor(_class$1.prototype, "stream", [Private], {
-  configurable: true,
-  enumerable: true,
-  writable: true,
-  initializer: null
-}), _descriptor4$1 = applyDecoratedDescriptor(_class$1.prototype, "debug", [Private], {
-  configurable: true,
-  enumerable: true,
-  writable: true,
-  initializer: function initializer() {
-    return DEBUG.NONE;
-  }
-}), _descriptor5$1 = applyDecoratedDescriptor(_class$1.prototype, "closeOnDone", [Private], {
-  configurable: true,
-  enumerable: true,
-  writable: true,
-  initializer: function initializer() {
-    return false;
-  }
-}), applyDecoratedDescriptor(_class$1.prototype, "openChannel", [coreDecorators.autobind], Object.getOwnPropertyDescriptor(_class$1.prototype, "openChannel"), _class$1.prototype)), _class$1);
+}(events.EventEmitter), (applyDecoratedDescriptor(_class.prototype, "openChannel", [coreDecorators.autobind], Object.getOwnPropertyDescriptor(_class.prototype, "openChannel"), _class.prototype)), _class);
 
-var _class$2, _descriptor$2, _descriptor2$2, _descriptor3$2, _descriptor4$2, _descriptor5$2, _descriptor6$1, _descriptor7$1, _descriptor8$1, _descriptor9$1, _temp$2, _class3, _descriptor10$1, _descriptor11$1, _descriptor12$1, _descriptor13$1, _descriptor14$1, _descriptor15$1, _descriptor16$1, _temp2;
+var _class$1;
 function ownKeys$1(object, enumerableOnly) { var keys = Object.keys(object); if (Object.getOwnPropertySymbols) { var symbols = Object.getOwnPropertySymbols(object); if (enumerableOnly) symbols = symbols.filter(function (sym) { return Object.getOwnPropertyDescriptor(object, sym).enumerable; }); keys.push.apply(keys, symbols); } return keys; }
 function _objectSpread$1(target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i] != null ? arguments[i] : {}; if (i % 2) { ownKeys$1(Object(source), true).forEach(function (key) { defineProperty(target, key, source[key]); }); } else if (Object.getOwnPropertyDescriptors) { Object.defineProperties(target, Object.getOwnPropertyDescriptors(source)); } else { ownKeys$1(Object(source)).forEach(function (key) { Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key)); }); } } return target; }
 var Socket = net.Socket;
 var nullString = String.fromCharCode(0);
-var MikroNode = (_class$2 = (_temp$2 = function () {
+var _host = new WeakMap();
+var _port = new WeakMap();
+var _debug$2 = new WeakMap();
+var _timeout = new WeakMap();
+var _sock = new WeakMap();
+var _status$2 = new WeakMap();
+var _tls = new WeakMap();
+var _socketOpts = new WeakMap();
+var _socketProto = new WeakMap();
+var MikroNode = function () {
   function MikroNode(host) {
     var port = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 8728;
     var timeout = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : 5;
     classCallCheck(this, MikroNode);
-    initializerDefineProperty(this, "host", _descriptor$2, this);
-    initializerDefineProperty(this, "port", _descriptor2$2, this);
-    initializerDefineProperty(this, "debug", _descriptor3$2, this);
-    initializerDefineProperty(this, "timeout", _descriptor4$2, this);
-    initializerDefineProperty(this, "sock", _descriptor5$2, this);
-    initializerDefineProperty(this, "status", _descriptor6$1, this);
-    initializerDefineProperty(this, "tls", _descriptor7$1, this);
-    initializerDefineProperty(this, "socketOpts", _descriptor8$1, this);
-    initializerDefineProperty(this, "socketProto", _descriptor9$1, this);
-    this.host = host;
-    this.port = port;
-    this.timeout = timeout;
+    _debug$2.set(this, DEBUG.NONE);
+    _status$2.set(this, CONNECTION.DISCONNECTED);
+    _tls.set(this, null);
+    _socketOpts.set(this, {});
+    _socketProto.set(this, 'tcp4');
+    _host.set(this, host);
+    _port.set(this, port);
+    _timeout.set(this, timeout);
   }
   createClass(MikroNode, [{
     key: "setDebug",
     value: function setDebug(debug) {
-      this.debug = debug;
-      if (this.sock) this.sock.setDebug(debug);
+      _debug$2.set(this, debug);
+      if (_sock.get(this)) _sock.get(this).setDebug(debug);
       if (this.connection) this.connection.setDebug(debug);
     }
   }, {
     key: "setPort",
     value: function setPort(port) {
-      this.port = port;
+      _port.set(this, port);
     }
   }, {
     key: "TLS",
     value: function TLS() {
       var opts = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
       if (opts) {
-        this.tls = opts;
-        if (opts.host) this.host = opts.host;
-        if (opts.port) this.port = opts.port;
+        _tls.set(this, opts);
+        if (opts.host) _host.set(this, opts.host);
+        if (opts.port) _port.set(this, opts.port);
         return this;
       }
-      return this.tls;
+      return _tls.get(this);
     }
   }, {
     key: "setTimeout",
     value: function setTimeout(timeout) {
-      this.timeout = timeout;
-      this.sock.setTimeout(timeout);
+      _timeout.set(this, timeout);
+      _sock.get(this).setTimeout(timeout);
     }
   }, {
     key: "connect",
     value: function connect(arg1, arg2) {
       var _this = this;
-      this.debug >= DEBUG.INFO && console.log('Connecting to ' + this.host);
+      _debug$2.get(this) >= DEBUG.INFO && console.log('Connecting to ' + _host.get(this));
       var cb;
-      this.debug >= DEBUG.SILLY && console.log('Creating socket');
-      this.sock = new SocketStream(this.timeout, this.debug, this.tls ? _typeof_1(this.tls) === _typeof_1({}) ? this.tls : {} : false);
-      var stream = this.sock.getStream();
+      _debug$2.get(this) >= DEBUG.SILLY && console.log('Creating socket');
+      _sock.set(this, new SocketStream(_timeout.get(this), _debug$2.get(this), _tls.get(this) ? _typeof_1(_tls.get(this)) === _typeof_1({}) ? _tls.get(this) : {} : false));
+      var stream = _sock.get(this).getStream();
       if (_typeof_1(arg1) === _typeof_1({})) {
-        this.socketOpts = _objectSpread$1(_objectSpread$1({}, this.socketOpts), {}, {
+        _socketOpts.set(this, _objectSpread$1(_objectSpread$1({}, _socketOpts.get(this)), {}, {
           arg1: arg1
-        });
+        }));
         if (_typeof_1(arg1) === _typeof_1(function () {})) cb = arg2;
       } else if (_typeof_1(arg1) === _typeof_1(function () {})) cb = arg1;
       var close = function close() {
-        return _this.sock.getStream().sentence.complete();
+        return _sock.get(_this).getStream().sentence.complete();
       };
       var login = function login(user, password, post, cb) {
         if (post === undefined) {
           post = true;
         }
-        _this.debug >= DEBUG.DEBUG && console.log('Logging in');
+        _debug$2.get(_this) >= DEBUG.DEBUG && console.log('Logging in');
         stream.write('/login');
         var _getUnwrappedPromise = getUnwrappedPromise(),
             promise = _getUnwrappedPromise.promise,
@@ -16361,7 +16213,7 @@ var MikroNode = (_class$2 = (_temp$2 = function () {
           resolve: resolve,
           reject: reject
         });
-        _this.connection.setDebug(_this.debug);
+        _this.connection.setDebug(_debug$2.get(_this));
         promise.then(function () {
           if (cb) cb(null, _this.connection);
         }, function (err) {
@@ -16369,27 +16221,27 @@ var MikroNode = (_class$2 = (_temp$2 = function () {
         });
         return promise;
       };
-      this.debug >= DEBUG.SILLY && console.log('Creating promise for socket connect');
+      _debug$2.get(this) >= DEBUG.SILLY && console.log('Creating promise for socket connect');
       var promise$1 = new promise(function (resolve, reject) {
-        _this.debug >= DEBUG.SILLY && console.log('Connecting to remote host. Detected %s', net.isIPv6(_this.host) ? 'ipv6' : net.isIPv4(_this.host) ? 'ipv4' : 'DNS lookup');
-        var fn = net.isIPv4(_this.host) || net.isIPv6(_this.host) ? (_this.socketOpts.family = net.isIPv6(_this.host) ? 6 : 4, function (a, b) {
+        _debug$2.get(_this) >= DEBUG.SILLY && console.log('Connecting to remote host. Detected %s', net.isIPv6(_host.get(_this)) ? 'ipv6' : net.isIPv4(_host.get(_this)) ? 'ipv4' : 'DNS lookup');
+        var fn = net.isIPv4(_host.get(_this)) || net.isIPv6(_host.get(_this)) ? (_socketOpts.get(_this).family = net.isIPv6(_host.get(_this)) ? 6 : 4, function (a, b) {
           return b(null, [a]);
-        }) : _this.socketOpts.family == 6 ? dns.resolve4 : dns.resolve6;
-        fn(_this.host, function (err, data) {
+        }) : _socketOpts.get(_this).family == 6 ? dns.resolve4 : dns.resolve6;
+        fn(_host.get(_this), function (err, data) {
           if (err) {
             return reject("Host resolve error: ", err);
           }
-          _this.sock.connect(_objectSpread$1(_objectSpread$1(_objectSpread$1({}, _this.socketOpts), _this.tls), {}, {
+          _sock.get(_this).connect(_objectSpread$1(_objectSpread$1(_objectSpread$1({}, _socketOpts.get(_this)), _tls.get(_this)), {}, {
             host: data[0],
-            port: _this.port
+            port: _port.get(_this)
           })).then(function (_ref) {
             var _ref2 = toArray(_ref),
                 socketOpts = _ref2[0],
                 args = _ref2.slice(1);
-            _this.debug >= DEBUG.DEBUG && console.log('Connected. Waiting for login.');
+            _debug$2.get(_this) >= DEBUG.DEBUG && console.log('Connected. Waiting for login.');
             resolve([login, socketOpts].concat(toConsumableArray(args)));
             if (cb) cb.apply(void 0, [null, login, socketOpts].concat(toConsumableArray(args)));
-            _this.sock.getStream().sentence.take(1).subscribe(null, reject, null);
+            _sock.get(_this).getStream().sentence.take(1).subscribe(null, reject, null);
           })["catch"](function (err) {
             if (cb) cb(err, null);
             reject(err);
@@ -16401,68 +16253,13 @@ var MikroNode = (_class$2 = (_temp$2 = function () {
   }, {
     key: "socketOpts",
     set: function set(opts) {
-      this.socketOpts = opts;
-      if (opts.host) this.host = opts.host;
-      if (opts.port) this.port = opts.port;
+      _socketOpts.set(this, opts);
+      if (opts.host) _host.set(this, opts.host);
+      if (opts.port) _port.set(this, opts.port);
     }
   }]);
   return MikroNode;
-}(), _temp$2), (_descriptor$2 = applyDecoratedDescriptor(_class$2.prototype, "host", [Private], {
-  configurable: true,
-  enumerable: true,
-  writable: true,
-  initializer: null
-}), _descriptor2$2 = applyDecoratedDescriptor(_class$2.prototype, "port", [Private], {
-  configurable: true,
-  enumerable: true,
-  writable: true,
-  initializer: null
-}), _descriptor3$2 = applyDecoratedDescriptor(_class$2.prototype, "debug", [Private], {
-  configurable: true,
-  enumerable: true,
-  writable: true,
-  initializer: function initializer() {
-    return DEBUG.NONE;
-  }
-}), _descriptor4$2 = applyDecoratedDescriptor(_class$2.prototype, "timeout", [Private], {
-  configurable: true,
-  enumerable: true,
-  writable: true,
-  initializer: null
-}), _descriptor5$2 = applyDecoratedDescriptor(_class$2.prototype, "sock", [Private], {
-  configurable: true,
-  enumerable: true,
-  writable: true,
-  initializer: null
-}), _descriptor6$1 = applyDecoratedDescriptor(_class$2.prototype, "status", [Private], {
-  configurable: true,
-  enumerable: true,
-  writable: true,
-  initializer: function initializer() {
-    return CONNECTION.DISCONNECTED;
-  }
-}), _descriptor7$1 = applyDecoratedDescriptor(_class$2.prototype, "tls", [Private], {
-  configurable: true,
-  enumerable: true,
-  writable: true,
-  initializer: function initializer() {
-    return null;
-  }
-}), _descriptor8$1 = applyDecoratedDescriptor(_class$2.prototype, "socketOpts", [Private], {
-  configurable: true,
-  enumerable: true,
-  writable: true,
-  initializer: function initializer() {
-    return {};
-  }
-}), _descriptor9$1 = applyDecoratedDescriptor(_class$2.prototype, "socketProto", [Private], {
-  configurable: true,
-  enumerable: true,
-  writable: true,
-  initializer: function initializer() {
-    return 'tcp4';
-  }
-})), _class$2);
+}();
 var api = Object.assign(MikroNode, DEBUG);
 var index$1 = Object.assign(api, {
   CONNECTION: CONNECTION,
@@ -16471,25 +16268,32 @@ var index$1 = Object.assign(api, {
   resultsToObj: resultsToObj,
   getUnwrappedPromise: getUnwrappedPromise
 });
-var SocketStream = (_class3 = (_temp2 = function () {
+var _rawSocket = new WeakMap();
+var _socket = new WeakMap();
+var _status2 = new WeakMap();
+var _debug2 = new WeakMap();
+var _sentence$ = new WeakMap();
+var _parsed$ = new WeakMap();
+var _data$ = new WeakMap();
+var _closeSocket = new WeakMap();
+var SocketStream = (_class$1 = function () {
   function SocketStream(timeout, debug, tls) {
     var _this2 = this;
     classCallCheck(this, SocketStream);
-    initializerDefineProperty(this, "rawSocket", _descriptor10$1, this);
-    initializerDefineProperty(this, "socket", _descriptor11$1, this);
-    initializerDefineProperty(this, "status", _descriptor12$1, this);
-    initializerDefineProperty(this, "debug", _descriptor13$1, this);
-    initializerDefineProperty(this, "sentence$", _descriptor14$1, this);
-    initializerDefineProperty(this, "parsed$", _descriptor15$1, this);
-    initializerDefineProperty(this, "data$", _descriptor16$1, this);
+    _status2.set(this, CONNECTION.NONE);
+    _debug2.set(this, DEBUG.NONE);
+    _closeSocket.set(this, function _(e) {
+      _debug2.get(this) >= DEBUG.DEBUG && console.log("Closing Socket ", e);
+      e ? _rawSocket.get(this).destroy(e) : _rawSocket.get(this).destroy();
+    }.bind(this));
     debug >= DEBUG.DEBUG && console.log('SocketStream::new', [timeout, debug]);
-    this.debug = debug;
-    this.rawSocket = new Socket();
-    this.socket = tls ? new TLS.TLSSocket(this.rawSocket, tls) : this.rawSocket;
-    this.sentence$ = new Subject$1();
+    _debug2.set(this, debug);
+    _rawSocket.set(this, new Socket());
+    _socket.set(this, tls ? new TLS.TLSSocket(_rawSocket.get(this), tls) : _rawSocket.get(this));
+    _sentence$.set(this, new Subject$1());
     var holdBuffer = [];
-    this.parsed$ = this.sentence$["do"](function (d) {
-      return _this2.debug >= DEBUG.SILLY && console.log("Data to parse:", JSON.stringify(d));
+    _parsed$.set(this, _sentence$.get(this)["do"](function (d) {
+      return _debug2.get(_this2) >= DEBUG.SILLY && console.log("Data to parse:", JSON.stringify(d));
     }).map(function (o) {
       return o.map(function (x) {
         return x.split("\r").join("\\r").split("\n").join("\\n");
@@ -16511,7 +16315,7 @@ var SocketStream = (_class3 = (_temp2 = function () {
       console.error("Skipping and continuing");
       console.error("***************************************************************************");
       console.error("***************************************************************************");
-      return _this2.parsed$;
+      return _parsed$.get(_this2);
     }).filter(function (e) {
       return !!e;
     }).flatMap(function (d) {
@@ -16520,64 +16324,58 @@ var SocketStream = (_class3 = (_temp2 = function () {
       });
       return Observable$1.from(d);
     })
-    .share();
-    this.data$ = Observable$1.fromEvent(this.socket, 'data');
-    this.data$.scan(function (
+    .share());
+    _data$.set(this, Observable$1.fromEvent(_socket.get(this), 'data'));
+    _data$.get(this).scan(function (
     last,
     stream, i) {
       var buff = Buffer.concat([last, stream]),
           end = 0,
           idx = 0,
           packet;
-      _this2.debug >= DEBUG.DEBUG && console.log("Packet received: ", stream.toString().split("\0"));
-      _this2.debug >= DEBUG.DEBUG && last.length > 0 && console.log("Starting parse loop w/existing packet ", last.toString());
+      _debug2.get(_this2) >= DEBUG.DEBUG && console.log("Packet received: ", stream.toString().split("\0"));
+      _debug2.get(_this2) >= DEBUG.DEBUG && last.length > 0 && console.log("Starting parse loop w/existing packet ", last.toString());
       while (idx < buff.length && (end = buff.indexOf("\0", idx, "utf8")) !== -1) {
-        _this2.debug >= DEBUG.SILLY && console.log("Decoding: ", idx, end, buff.length, buff.slice(idx, end));
+        _debug2.get(_this2) >= DEBUG.SILLY && console.log("Decoding: ", idx, end, buff.length, buff.slice(idx, end));
         packet = decodePacket(buff.slice(idx, end));
         idx = end + 1;
-        _this2.debug >= DEBUG.SILLY && console.log('Detected end of sentence, posting existing sentence', packet);
-        _this2.sentence$.next(packet);
+        _debug2.get(_this2) >= DEBUG.SILLY && console.log('Detected end of sentence, posting existing sentence', packet);
+        _sentence$.get(_this2).next(packet);
       }
       return idx >= buff.length ? Buffer.alloc(0) : buff.slice(idx, buff.length);
     }, Buffer.from([])).subscribe(function (e) {
-      return _this2.debug >= DEBUG.DEBUG && e.length && console.log('Buffer leftover: ', e);
-    }, this.closeSocket, this.closeSocket);
-    this.socket.on('end', function (a) {
-      _this2.debug >= DEBUG.INFO && console.log('Connection end ' + a);
-      if (_this2.status == CONNECTION.CONNECTED)
-        _this2.sentence$.complete();
+      return _debug2.get(_this2) >= DEBUG.DEBUG && e.length && console.log('Buffer leftover: ', e);
+    }, _closeSocket.get(this), _closeSocket.get(this));
+    _socket.get(this).on('end', function (a) {
+      _debug2.get(_this2) >= DEBUG.INFO && console.log('Connection end ' + a);
+      if (_status2.get(_this2) == CONNECTION.CONNECTED)
+        _sentence$.get(_this2).complete();
     });
-    this.socket.on('error', function (a) {
-      _this2.debug >= DEBUG.ERROR && console.log('Connection error: ' + a);
-      _this2.sentence$.error(a);
+    _socket.get(this).on('error', function (a) {
+      _debug2.get(_this2) >= DEBUG.ERROR && console.log('Connection error: ' + a);
+      _sentence$.get(_this2).error(a);
     });
     this.setTimeout(timeout);
-    this.socket.setKeepAlive(true);
+    _socket.get(this).setKeepAlive(true);
     this.b = [];
     this.len = 0;
     this.line = '';
   }
   createClass(SocketStream, [{
-    key: "closeSocket",
-    value: function closeSocket(e) {
-      this.debug >= DEBUG.DEBUG && console.log("Closing Socket ", e);
-      e ? this.rawSocket.destroy(e) : this.rawSocket.destroy();
-    }
-  }, {
     key: "setDebug",
     value: function setDebug(d) {
-      this.debug >= DEBUG.DEBUG && console.log('SocketStream::setDebug', [d]);
-      this.debug = d;
+      _debug2.get(this) >= DEBUG.DEBUG && console.log('SocketStream::setDebug', [d]);
+      _debug2.set(this, d);
     }
   }, {
     key: "setTimeout",
     value: function setTimeout(timeout) {
       var _this3 = this;
-      this.debug >= DEBUG.DEBUG && console.log('SocketStream::setTimeout', [timeout]);
-      this.socket.setTimeout(timeout * 1000, function (e) {
-        if (_this3.status !== CONNECTION.CONNECTED) {
-          _this3.debug && console.log('Socket Timeout');
-          _this3.sentence$.error("Timeout: ", JSON.stringify(e));
+      _debug2.get(this) >= DEBUG.DEBUG && console.log('SocketStream::setTimeout', [timeout]);
+      _socket.get(this).setTimeout(timeout * 1000, function (e) {
+        if (_status2.get(_this3) !== CONNECTION.CONNECTED) {
+          _debug2.get(_this3) && console.log('Socket Timeout');
+          _sentence$.get(_this3).error("Timeout: ", JSON.stringify(e));
         }
       });
     }
@@ -16585,38 +16383,38 @@ var SocketStream = (_class3 = (_temp2 = function () {
     key: "connect",
     value: function connect(socketOpts) {
       var _this4 = this;
-      this.debug >= DEBUG.DEBUG && console.log('SocketStream::Connect %s', this.tls ? "(TLS)" : "", socketOpts);
-      this.status = CONNECTION.CONNECTING;
+      _debug2.get(this) >= DEBUG.DEBUG && console.log('SocketStream::Connect %s', this.tls ? "(TLS)" : "", socketOpts);
+      _status2.set(this, CONNECTION.CONNECTING);
       this.host = socketOpts.host || 'localhost';
       return new promise(function (res, rej) {
-        _this4.sentence$
+        _sentence$.get(_this4)
         .subscribe(null, function (e) {
           rej(e);
-          _this4.closeSocket();
-        }, _this4.closeSocket);
+          _closeSocket.get(_this4)();
+        }, _closeSocket.get(_this4));
         try {
-          _this4.rawSocket.connect(socketOpts, function () {
+          _rawSocket.get(_this4).connect(socketOpts, function () {
             for (var _len = arguments.length, args = new Array(_len), _key = 0; _key < _len; _key++) {
               args[_key] = arguments[_key];
             }
-            _this4.debug >= DEBUG.INFO && console.log('SocketStream::Connected ', args, socketOpts);
-            _this4.status = CONNECTION.CONNECTED;
+            _debug2.get(_this4) >= DEBUG.INFO && console.log('SocketStream::Connected ', args, socketOpts);
+            _status2.set(_this4, CONNECTION.CONNECTED);
             socketOpts = _objectSpread$1(_objectSpread$1({}, socketOpts), {}, {
-              localAddress: _this4.socket.localAddress,
-              localPort: _this4.socket.localPort
+              localAddress: _socket.get(_this4).localAddress,
+              localPort: _socket.get(_this4).localPort
             });
-            if (_this4.socket.encrypted) res([_objectSpread$1(_objectSpread$1({}, socketOpts), {}, {
-              authorized: _this4.socket.authorized,
-              authorizationError: _this4.socket.authorizationError,
-              protocol: _this4.socket.getProtocol(),
-              alpnProtocol: _this4.socket.alpnProtocol,
-              npnProtocol: _this4.socket.npnProtocol,
-              cipher: _this4.socket.getCipher(),
-              cert: _this4.socket.getPeerCertificate()
+            if (_socket.get(_this4).encrypted) res([_objectSpread$1(_objectSpread$1({}, socketOpts), {}, {
+              authorized: _socket.get(_this4).authorized,
+              authorizationError: _socket.get(_this4).authorizationError,
+              protocol: _socket.get(_this4).getProtocol(),
+              alpnProtocol: _socket.get(_this4).alpnProtocol,
+              npnProtocol: _socket.get(_this4).npnProtocol,
+              cipher: _socket.get(_this4).getCipher(),
+              cert: _socket.get(_this4).getPeerCertificate()
             })].concat(args));else res([socketOpts].concat(args));
           });
         } catch (e) {
-          _this4.debug >= DEBUG.DEBUG && console.error('Caught exception while opening socket: ', e);
+          _debug2.get(_this4) >= DEBUG.DEBUG && console.error('Caught exception while opening socket: ', e);
           rej(e);
         }
       });
@@ -16625,10 +16423,10 @@ var SocketStream = (_class3 = (_temp2 = function () {
     key: "getStream",
     value: function getStream() {
       return {
-        sentence: this.sentence$,
+        sentence: _sentence$.get(this),
         write: this.write,
-        read: this.parsed$,
-        raw: this.data$
+        read: _parsed$.get(this),
+        raw: _data$.get(this)
       };
     }
   }, {
@@ -16636,66 +16434,27 @@ var SocketStream = (_class3 = (_temp2 = function () {
     value: function write(data, args) {
       var _this5 = this;
       if (args && _typeof_1(args) === _typeof_1({})) {
-        this.debug >= DEBUG.SILLY && console.log("Converting obj to args", args);
+        _debug2.get(this) >= DEBUG.SILLY && console.log("Converting obj to args", args);
         data = data.concat(Array.isArray(args) ? args : objToAPIParams(args, data[0].split('/').pop()));
       }
-      this.debug >= DEBUG.DEBUG && console.log('SocketStream::write:', [data]);
-      if (!this.socket || !(this.status & (CONNECTION.CONNECTED | CONNECTION.CONNECTING))) {
-        this.debug > DEBUG.WARN && console.log('write: not connected ');
+      _debug2.get(this) >= DEBUG.DEBUG && console.log('SocketStream::write:', [data]);
+      if (!_socket.get(this) || !(_status2.get(this) & (CONNECTION.CONNECTED | CONNECTION.CONNECTING))) {
+        _debug2.get(this) > DEBUG.WARN && console.log('write: not connected ');
         return;
       }
       if (_typeof_1(data) === STRING_TYPE) data = [data];else if (!Array.isArray(data)) return;
       data.forEach(function (i) {
         try {
-          _this5.debug >= DEBUG.DEBUG && console.log('SocketStream::write: sending ' + i);
-          _this5.socket.write(encodeString(i, _this5.debug & DEBUG.SILLY));
+          _debug2.get(_this5) >= DEBUG.DEBUG && console.log('SocketStream::write: sending ' + i);
+          _socket.get(_this5).write(encodeString(i, _debug2.get(_this5) & DEBUG.SILLY));
         } catch (error) {
-          _this5.sentence$.error(error);
+          _sentence$.get(_this5).error(error);
         }
       });
-      this.socket.write(nullString);
+      _socket.get(this).write(nullString);
     }
   }]);
   return SocketStream;
-}(), _temp2), (_descriptor10$1 = applyDecoratedDescriptor(_class3.prototype, "rawSocket", [Private], {
-  configurable: true,
-  enumerable: true,
-  writable: true,
-  initializer: null
-}), _descriptor11$1 = applyDecoratedDescriptor(_class3.prototype, "socket", [Private], {
-  configurable: true,
-  enumerable: true,
-  writable: true,
-  initializer: null
-}), _descriptor12$1 = applyDecoratedDescriptor(_class3.prototype, "status", [Private], {
-  configurable: true,
-  enumerable: true,
-  writable: true,
-  initializer: function initializer() {
-    return CONNECTION.NONE;
-  }
-}), _descriptor13$1 = applyDecoratedDescriptor(_class3.prototype, "debug", [Private], {
-  configurable: true,
-  enumerable: true,
-  writable: true,
-  initializer: function initializer() {
-    return DEBUG.NONE;
-  }
-}), _descriptor14$1 = applyDecoratedDescriptor(_class3.prototype, "sentence$", [Private], {
-  configurable: true,
-  enumerable: true,
-  writable: true,
-  initializer: null
-}), _descriptor15$1 = applyDecoratedDescriptor(_class3.prototype, "parsed$", [Private], {
-  configurable: true,
-  enumerable: true,
-  writable: true,
-  initializer: null
-}), _descriptor16$1 = applyDecoratedDescriptor(_class3.prototype, "data$", [Private], {
-  configurable: true,
-  enumerable: true,
-  writable: true,
-  initializer: null
-}), applyDecoratedDescriptor(_class3.prototype, "closeSocket", [coreDecorators.autobind, Private], Object.getOwnPropertyDescriptor(_class3.prototype, "closeSocket"), _class3.prototype), applyDecoratedDescriptor(_class3.prototype, "write", [coreDecorators.autobind], Object.getOwnPropertyDescriptor(_class3.prototype, "write"), _class3.prototype)), _class3);
+}(), (applyDecoratedDescriptor(_class$1.prototype, "write", [coreDecorators.autobind], Object.getOwnPropertyDescriptor(_class$1.prototype, "write"), _class$1.prototype)), _class$1);
 
 module.exports = index$1;
